@@ -72,3 +72,12 @@ def save_model(model, optimizer, epoch, args, is_last=False):
     }
     logging.info(f'model save to {save_path}')
     torch.save(state, save_path)
+
+
+def get_remain_time(current_iter, max_iter, avg_time):
+    remain_iter = max_iter - (current_iter + 1)
+    remain_time = remain_iter * avg_time
+    t_m, t_s = divmod(remain_time, 60)
+    t_h, t_m = divmod(t_m, 60)
+    remain_time = '{:02d}:{:02d}:{:02d}'.format(int(t_h), int(t_m), int(t_s))
+    return remain_time

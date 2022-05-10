@@ -1,7 +1,7 @@
 import torch
 import argparse
 import os
-from utils import setup_seed, get_logger, AverageMeter, get_lr, save_model
+from utils import setup_seed, get_logger, AverageMeter, get_lr, save_model, get_remain_time
 from model import Model
 from torch.utils.data import DataLoader
 from dataset import TrainSet, ValidationSet
@@ -30,13 +30,7 @@ def train(args, model, optimizer, train_loader, device, criterion):
         loss.backward()
         optimizer.step()
 
-        loss_meter.update(loss.item(), n)
-        batch_time.update(time.time() - start)
-        remain_iter = max_iter - current_iter
-        remain_time = remain_iter * batch_time.avg
-        t_m, t_s = divmod(remain_time, 60)
-        t_h, t_m = divmod(t_m, 60)
-        remain_time = '{:02d}:{:02d}:{:02d}'.format(int(t_h), int(t_m), int(t_s))
+        remain_time = get_remain_time(idx, max_iter, batch_time.avg)
         print('\r{}: {}/{}, loss: {} [remain: {}]'.format(train.__name__, idx+1, len(train_loader), loss_meter.avg, remain_time), end='', flush=True)
     print()
     return loss_meter.avg
@@ -63,11 +57,7 @@ def validation(model, test_loader, device, criterion):
             labels.append(label.view(-1).detach().item())
 
             batch_time.update(time.time() - start)
-            remain_iter = max_iter - (i + 1)
-            remain_time = remain_iter * batch_time.avg
-            t_m, t_s = divmod(remain_time, 60)
-            t_h, t_m = divmod(t_m, 60)
-            remain_time = '{:02d}:{:02d}:{:02d}'.format(int(t_h), int(t_m), int(t_s))
+            remain_time = get_remain_time(i, len(test_loader), batch_time.avg)
             print('\r{}: {}/{} [remain: {}]'.format(train.__name__, i + 1, len(test_loader), remain_time), end='',
                   flush=True)
 
@@ -126,10 +116,7 @@ def main():
         if epoch % 500 == 0 and epoch > 0:
             save_model(model, optimizer, epoch, args)
         epoch_meter.update(time.time() - start)
-        remain_time = (args.epoch - (epoch+1)) * epoch_meter.avg
-        t_m, t_s = divmod(remain_time, 60)
-        t_h, t_m = divmod(t_m, 60)
-        remain_time = '{:02d}:{:02d}:{:02d}'.format(int(t_h), int(t_m), int(t_s))
+        remain_time = get_remain_time(epoch, args.epoch, epoch_meter.avg)
         print('epoch: {}/{} [remain: {}]'.format(epoch + 1, args.epoch, remain_time))
 
 

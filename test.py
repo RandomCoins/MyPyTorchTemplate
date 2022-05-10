@@ -3,7 +3,7 @@ from dataset import TestSet
 from torch.utils.data import DataLoader
 import torch
 from model import Model
-from utils import AverageMeter
+from utils import AverageMeter, get_remain_time
 import os
 import time
 import pandas as pd
@@ -27,11 +27,7 @@ def test(model, dataloader, device):
             labels.append(label.detach().cpu().item())
 
             time_meter.update(time.time() - start)
-            remain_iter = len(dataloader) - (i + 1)
-            remain_time = remain_iter * time_meter.avg
-            t_m, t_s = divmod(remain_time, 60)
-            t_h, t_m = divmod(t_m, 60)
-            remain_time = '{:02d}:{:02d}:{:02d}'.format(int(t_h), int(t_m), int(t_s))
+            remain_time = get_remain_time(i, len(dataloader), time_meter.avg)
             print('\r{}: {}/{} [remain: {}]'.format(test.__name__, i + 1, len(dataloader), remain_time), end='',
                   flush=True)
         print()
