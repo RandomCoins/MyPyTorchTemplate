@@ -23,9 +23,6 @@ class BaseDataset(Dataset, abc.ABC):
 
 
 class TrainSet(BaseDataset):
-    def __init__(self, path):
-        super().__init__(path)
-
     def __getitem__(self, item):
         image = Image.open(self.images[item]).convert('RGB')
         score = self.labels[item]
@@ -39,9 +36,6 @@ class TrainSet(BaseDataset):
 
 
 class ValidationSet(BaseDataset):
-    def __init__(self, path):
-        super().__init__(path)
-
     def __getitem__(self, item):
         image = Image.open(self.images[item]).convert('RGB')
         score = self.labels[item]
@@ -50,9 +44,6 @@ class ValidationSet(BaseDataset):
 
 
 class TestSet(BaseDataset):
-    def __init__(self, path):
-        super().__init__(path)
-
     def __getitem__(self, item):
         image = Image.open(self.images[item]).convert('RGB')
         image_name = self.images[item]
