@@ -4,7 +4,7 @@ import os
 from utils import setup_seed, get_logger, AverageMeter, get_lr, save_model
 from model import Model
 from torch.utils.data import DataLoader
-from dataset import ImageSet
+from dataset import TrainSet, ValidationSet
 from tensorboardX import SummaryWriter
 from scipy.stats import spearmanr
 import time
@@ -87,10 +87,10 @@ def main():
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     print('==> Preparing data..')
-    train_set = ImageSet(args.train_data, 'train')
+    train_set = TrainSet(args.train_data)
     train_loader = DataLoader(train_set, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True)
 
-    val_set = ImageSet(args.val_data, 'val')
+    val_set = ValidationSet(args.val_data)
     val_loader = DataLoader(val_set, batch_size=1, num_workers=args.num_workers)
 
     print('==> Building model..')

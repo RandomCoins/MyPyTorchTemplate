@@ -1,5 +1,5 @@
 import argparse
-from dataset import ImageSet
+from dataset import TestSet
 from torch.utils.data import DataLoader
 import torch
 from model import Model
@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     os.environ['CUDA_VISIBLE_DEVICES'] = cfg.gpu
 
-    dataset = ImageSet(cfg.data, mode='test')
+    dataset = TestSet(cfg.data)
     dataloader = DataLoader(dataset, batch_size=1, num_workers=4)
     print('==> Loading model...')
     if os.path.isfile(cfg.model) and os.path.exists(cfg.model):
