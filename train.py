@@ -20,7 +20,6 @@ def train(args, model, optimizer, train_loader, device, criterion):
     for idx, (image, label) in enumerate(train_loader):
         start = time.time()
         n = image.size(0)
-        current_iter = idx + 1
 
         image = image.to(device)
         label = label.to(device)
@@ -30,8 +29,10 @@ def train(args, model, optimizer, train_loader, device, criterion):
         loss.backward()
         optimizer.step()
 
+        loss_meter.update(loss.item(), n)
+        batch_time.update(time.time() - start)
         remain_time = get_remain_time(idx, max_iter, batch_time.avg)
-        print('\r{}: {}/{}, loss: {} [remain: {}]'.format(train.__name__, idx+1, len(train_loader), loss_meter.avg, remain_time), end='', flush=True)
+        print('\r{}: {}/{}, loss: {:.4f} [remain: {}]'.format(train.__name__, idx+1, len(train_loader), loss_meter.avg, remain_time), end='', flush=True)
     print()
     return loss_meter.avg
 
