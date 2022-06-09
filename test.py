@@ -12,7 +12,7 @@ from scipy.stats import spearmanr
 
 def test(model, dataloader, device):
     model.eval()
-    time_meter = AverageMeter()
+    time_meter = AverageMeter('Time', ':6.3f')
 
     predict = []
     labels = []

@@ -6,7 +6,16 @@ import os
 
 
 class AverageMeter(object):
-    def __init__(self):
+    def __init__(self, name, fmt=':f'):
+        self.name = name
+        self.fmt = fmt
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+        self.reset()
+
+    def reset(self):
         self.val = 0
         self.avg = 0
         self.sum = 0
@@ -14,15 +23,13 @@ class AverageMeter(object):
 
     def update(self, val, n=1):
         self.val = val
-        self.sum += val * n
+        self.sum += val
         self.count += n
         self.avg = self.sum / self.count
 
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
+    def __str__(self):
+        fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
+        return fmtstr.format(**self.__dict__)
 
 
 class ProgressMeter(object):
@@ -76,14 +83,13 @@ def get_lr(optimizer):
     return lr
 
 
-def save_model(model, optimizer, epoch, args, is_last=False):
+def save_model(model, optimizer, epoch, args):
     save_path = os.path.join(args.log_dir, args.name, 'checkpoint')
-    if is_last:
-        save_path = os.path.join(save_path, 'final.pth')
-    else:
-        save_path = os.path.join(save_path, 'epoch_{}.pth'.format(epoch))
+    if os.path.exists(os.path.join(save_path, 'epoch_{}.pth'.format(epoch - 1))):
+        os.remove(os.path.join(save_path, 'epoch_{}.pth'.format(epoch - 1)))
+    save_path = os.path.join(save_path, 'epoch_{}.pth'.format(epoch))
     state = {
-        'model': model.module.state_dict() if isinstance(model, torch.nn.DataParallel) else model.state_dict(),
+        'model': model.module.state_dict() if isinstance(model, torch.nn.parallel.DistributedDataParallel) else model.state_dict(),
         'optimizer': optimizer.state_dict(),
         'epoch': epoch
     }
